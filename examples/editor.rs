@@ -66,9 +66,9 @@ struct RectBlueprintParams<'w> {
 
 impl FromBlueprint<RectBlueprint> for RectBundle {
     type Params<'w, 's> = RectBlueprintParams<'w>;
-    fn from_blueprint<'w, 's>(
+    fn from_blueprint(
         blueprint: &RectBlueprint,
-        params: &mut StaticSystemParam<Self::Params<'w, 's>>,
+        params: &mut StaticSystemParam<Self::Params<'_, '_>>,
     ) -> Self {
         RectBundle {
             size: RectSize(blueprint.size),
@@ -86,9 +86,9 @@ impl FromBlueprint<RectBlueprint> for RectBundle {
 
 impl FromBlueprint<RectHierarchalBlueprint> for RectBundle {
     type Params<'w, 's> = RectBlueprintParams<'w>;
-    fn from_blueprint<'w, 's>(
+    fn from_blueprint(
         blueprint: &RectHierarchalBlueprint,
-        params: &mut StaticSystemParam<Self::Params<'w, 's>>,
+        params: &mut StaticSystemParam<Self::Params<'_, '_>>,
     ) -> Self {
         RectBundle {
             size: RectSize(blueprint.size),

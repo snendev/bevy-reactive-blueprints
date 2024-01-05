@@ -20,9 +20,9 @@ pub enum BlueprintSet {
 pub trait FromBlueprint<T> {
     type Params<'w, 's>: SystemParam;
 
-    fn from_blueprint<'w, 's>(
+    fn from_blueprint(
         blueprint: &T,
-        params: &mut StaticSystemParam<Self::Params<'w, 's>>,
+        params: &mut StaticSystemParam<Self::Params<'_, '_>>,
     ) -> Self;
 }
 
@@ -123,10 +123,10 @@ where
     P: Bundle + FromBlueprint<B>,
     T: BlueprintTarget,
 {
-    fn sync_blueprint_prefab<'w, 's>(
+    fn sync_blueprint_prefab(
         mut commands: Commands,
         blueprint_query: Query<(Entity, &Blueprint<B>), Changed<Blueprint<B>>>,
-        mut system_params: StaticSystemParam<P::Params<'w, 's>>,
+        mut system_params: StaticSystemParam<P::Params<'_, '_>>,
     ) {
         for (entity, blueprint) in blueprint_query.iter() {
             let mut entity_commands = commands.entity(entity);
@@ -288,9 +288,9 @@ mod tests {
 
         impl FromBlueprint<Rect> for RectBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint<'w, 's>(
+            fn from_blueprint(
                 blueprint: &Rect,
-                _: &mut StaticSystemParam<Self::Params<'w, 's>>,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
             ) -> Self {
                 RectBundle {
                     size: RectSize(blueprint.size),
@@ -302,9 +302,9 @@ mod tests {
 
         impl FromBlueprint<SpecificRect> for RectBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint<'w, 's>(
+            fn from_blueprint(
                 _: &SpecificRect,
-                _: &mut StaticSystemParam<Self::Params<'w, 's>>,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
             ) -> Self {
                 let rect: Rect = Rect {
                     size: Vec2::new(10., 10.),
@@ -369,9 +369,9 @@ mod tests {
 
         impl FromBlueprint<Rect> for RectBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint<'w, 's>(
+            fn from_blueprint(
                 blueprint: &Rect,
-                _: &mut StaticSystemParam<Self::Params<'w, 's>>,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
             ) -> Self {
                 RectBundle {
                     size: RectSize(blueprint.size),
@@ -389,9 +389,9 @@ mod tests {
 
         impl FromBlueprint<Rect> for SecondRectBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint<'w, 's>(
+            fn from_blueprint(
                 blueprint: &Rect,
-                _: &mut StaticSystemParam<Self::Params<'w, 's>>,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
             ) -> Self {
                 SecondRectBundle {
                     area: RectArea(blueprint.size.x * blueprint.size.y),
@@ -437,9 +437,9 @@ mod tests {
 
         impl FromBlueprint<Rect> for RectBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint<'w, 's>(
+            fn from_blueprint(
                 _: &Rect,
-                _: &mut StaticSystemParam<Self::Params<'w, 's>>,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
             ) -> Self {
                 RectBundle {
                     color: RectColor(Color::RED),
@@ -455,9 +455,9 @@ mod tests {
 
         impl FromBlueprint<Rect> for RectChildBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint<'w, 's>(
+            fn from_blueprint(
                 blueprint: &Rect,
-                _: &mut StaticSystemParam<Self::Params<'w, 's>>,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
             ) -> Self {
                 RectChildBundle {
                     size: RectSize(blueprint.size),
