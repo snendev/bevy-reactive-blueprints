@@ -12,7 +12,13 @@ In particular, this crate is used well alongside [`bevy_editor_pls`](https://git
 
 ## Usage
 
-First, add `BlueprintsPlugin` to your app:
+### Blueprint/Prefab Types
+
+First, define the types that will serve as your blueprints and prefab bundles. The blueprint type should implement `Default` and `bevy::prelude::Reflect`.
+
+### Plugins
+
+Add `BlueprintsPlugin` to your app:
 
 ```rust
 let mut app = App::new();
@@ -24,8 +30,8 @@ This configures `BlueprintsSet`, a `SystemSet` where inner systems are attached,
 
 Then, individual blueprints can be defined by attaching a `BlueprintPlugin` for each pair of types that needs to be managed. `BlueprintPlugin` accepts three type parameters:
 
-1. The type that will serve as the blueprint (which does not need to be a component but can be)
-2. The `Bundle` that should be spawned
+1. The type that will serve as the blueprint (which does not need to be a component but can be). This should implement `Default` and `Reflect`.
+2. The `Bundle` that should be spawned, which needs to implement the `FromBlueprint<MyType>` trait ([see below](#fromblueprint)).
 3. Optionally, the `AsChild` type can be used here to instantiate the prefab as a child entity.
 
 ```rust
@@ -51,6 +57,70 @@ app.add_plugins(BlueprintPlugin::<MyBlueprint, ChildPrefabBundle, AsChild>::defa
 
 When doing this, be sure to respect Bevy's typical rules: if `SelfPrefabBundle1` and `SelfPrefabBundle2` share components, this will cause panics.
 
+### FromBlueprint
+
+In order for this to work, prefab bundles must implement the `FromBlueprint` trait. This requires defining the associated type `Params: SystemParam` which is uMyRectanglesed in the `from_blueprint` method to provide any system parameters necessary to perform the conversion.
+
+If no system params are necessary, this might look as follows:
+
+```rust
+impl FromBlueprint<MyType> for MyPrefabBundle {
+    // this is some bevy::ecs::SystemParam
+    type Params<'w, 's> = ();
+
+    fn from_blueprint(
+        blueprint: &Rect,
+        params: &mut StaticSystemParam<Self::Params<'_, '_>>,
+    ) -> Self {
+        MyPrefabBundle { /* ... */ }
+    }
+}
+```
+
+However, system parameters are frequently necessary to build prefab bundles, especially in order to access assets. This might look like the following:
+
+```rust
+#[derive(Bundle)]
+struct MyPrefabBundle {
+    pbr: PbrBundle,
+}
+
+#[derive(SystemParam)]
+struct MyBlueprintParams<'w> {
+    meshes: ResMut<'w, Assets<Mesh>>,
+    materials: ResMut<'w, Assets<StandardMaterial>>,
+}
+
+impl FromBlueprint<MyType> for MyPrefabBundle {
+    type Params<'w, 's> = MyBlueprintParams<'w>;
+
+    fn from_blueprint<'w, 's>(
+        blueprint: &MyType,
+        params: &mut StaticSystemParam<Self::Params<'w, 's>>,
+    ) -> Self {
+        MyPrefabBundle {
+            pbr: PbrBundle {
+                mesh: params.meshes.add(todo!()),
+                material: params.materials.add(todo!()),
+                transform: todo!(),
+                ..default()
+            },
+        }
+    }
+}
+```
+
+See the examples and tests for more information.
+
+## TODOs
+
+- Add docstrings.
+- Only require Reflect conditionally.
+- Build a crate that defines a helpful window for `bevy_editor_pls`.
+- Consider reorganizing so that an app extension trait could be used to register blueprint types. This might be more complicated than necessary, but would be nice for ergonomics.
+
 ## Caution
 
 Beware that this calls `despawn_recursive` and `despawn_descendants` to handle cleanup, so attaching child entities that aren't related to any blueprint is probably going to cause problems.
+
+If you have trouble getting the plugin to work, make sure that (1) your blueprint implements `Default` and `bevy::prelude::Reflect` and (2) your prefab implements `FromBlueprint`.
