@@ -4,7 +4,7 @@ This crate canonicalizes an approach to "blueprint"-based component patterns in 
 
 This allows users to attach one component, referred to here as the _blueprint_, and automatically attaches an associated `Bundle` to the entity (or spawns the Bundle as a child entity). This crate refers to the associated `Bundle` and any child entities created by this process as _prefabs_ associated with the blueprint. (I do not know whether this is entirely appropriate, but the value provided by the crate is similar to prefabs in typical game development environments.)
 
-The supported workflow involves defining a type that serves as a builder for some `Bundle`, attaching the appropriate plugin, and spawning entities with (or attach to existing entities some) `Blueprint::new(my_type)`. The plugins provided in `bevy_reactive_blueprints` attach systems that reactively update and remove prefab data, so updates to a `Blueprint` will remove and re-attach components and children as necessary.
+The supported workflow involves defining a type that serves as a builder for some `Bundle`, attaching the appropriate plugin, and spawning entities with (or attaching to existing entities) a `Blueprint::new(my_type)`. The plugins provided in `bevy_reactive_blueprints` attach systems that reactively update and remove prefab data, so updates to a `Blueprint` will remove and re-attach components and children as necessary.
 
 It is worth noting that the intention is _not_ to encourage frequently editing blueprint types in the application. Blueprints are best used for spawning and saving scenes or for development contexts.
 
@@ -59,7 +59,7 @@ When doing this, be sure to respect Bevy's typical rules: if `SelfPrefabBundle1`
 
 ### FromBlueprint
 
-In order for this to work, prefab bundles must implement the `FromBlueprint` trait. This requires defining the associated type `Params: SystemParam` which is uMyRectanglesed in the `from_blueprint` method to provide any system parameters necessary to perform the conversion.
+In order for this to work, prefab bundles must implement the `FromBlueprint` trait. This requires defining the associated type `Params: SystemParam` which is used in the `from_blueprint` method to provide any system parameters necessary to perform the conversion.
 
 If no system params are necessary, this might look as follows:
 
