@@ -110,7 +110,7 @@ impl FromBlueprint<MyType> for MyPrefabBundle {
 }
 ```
 
-See the examples and tests for more information.
+See the tests (and the example in the editor crate) for more information.
 
 ## TODOs
 
