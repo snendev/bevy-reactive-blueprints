@@ -1,8 +1,6 @@
-[workspace]
-members = ["editor"]
 
 [package]
-name = "bevy_reactive_blueprints"
+name = "bevy_reactive_blueprints_editor_window"
 version = "0.1.0"
 edition = "2021"
 authors = ["Sean Sullivan <me@snen.dev>"]
@@ -11,14 +9,14 @@ readme = "README.md"
 repository = "https://github.com/snendev/bevy-reactive-blueprints"
 
 [dependencies]
-bevy = { version = "0.12", default-features = false }
-
-[dev-dependencies]
-bevy_editor_pls = "0.7"
+bevy_reactive_blueprints = { path = "../" }
 bevy = { version = "0.12", default-features = false, features = [
     "tonemapping_luts",
 ] }
 
+bevy_editor_pls = "0.7"
+iyes_scene_tools = "0.2.0"
+
 [[example]]
-name = "editor"
-path = "examples/editor.rs"
+name = "basic"
+path = "examples/basic.rs"

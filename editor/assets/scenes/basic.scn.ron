@@ -1,0 +1,25 @@
+(
+  resources: {},
+  entities: {
+    5: (
+      components: {
+        "bevy_reactive_blueprints::Blueprint<basic::RectBlueprint>": ((
+          origin: (
+            x: 1.7,
+            y: 0.3,
+          ),
+          size: (
+            x: 1.0,
+            y: 4.2,
+          ),
+          color: Rgba(
+            red: 0.0,
+            green: 0.7254902,
+            blue: 1.0,
+            alpha: 1.0,
+          ),
+        )),
+      },
+    ),
+  },
+)

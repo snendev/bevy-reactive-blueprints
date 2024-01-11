@@ -20,10 +20,7 @@ pub enum BlueprintSet {
 pub trait FromBlueprint<T> {
     type Params<'w, 's>: SystemParam;
 
-    fn from_blueprint(
-        blueprint: &T,
-        params: &mut StaticSystemParam<Self::Params<'_, '_>>,
-    ) -> Self;
+    fn from_blueprint(blueprint: &T, params: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self;
 }
 
 #[derive(Debug, Component, Default, Reflect)]
@@ -437,10 +434,7 @@ mod tests {
 
         impl FromBlueprint<Rect> for RectBundle {
             type Params<'w, 's> = ();
-            fn from_blueprint(
-                _: &Rect,
-                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
-            ) -> Self {
+            fn from_blueprint(_: &Rect, _: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self {
                 RectBundle {
                     color: RectColor(Color::RED),
                 }
