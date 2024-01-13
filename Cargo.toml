@@ -14,11 +14,6 @@ repository = "https://github.com/snendev/bevy-reactive-blueprints"
 bevy = { version = "0.12", default-features = false }
 
 [dev-dependencies]
-bevy_editor_pls = "0.7"
 bevy = { version = "0.12", default-features = false, features = [
     "tonemapping_luts",
 ] }
-
-[[example]]
-name = "editor"
-path = "examples/editor.rs"

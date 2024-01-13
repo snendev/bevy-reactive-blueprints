@@ -4,12 +4,12 @@ use bevy::{
     prelude::*,
 };
 use bevy_editor_pls::{
-    default_windows::scenes::NotInScene, editor::EditorInternalState, egui_dock::NodeIndex,
-    AddEditorWindow, EditorPlugin,
+    editor::EditorInternalState, egui_dock::NodeIndex, prelude::NotInScene, AddEditorWindow,
+    EditorPlugin,
 };
 use bevy_reactive_blueprints::{AsChild, BlueprintPlugin, BlueprintsPlugin, FromBlueprint};
-use bevy_reactive_blueprints_editor_window::BlueprintSceneWindow;
 
+use bevy_reactive_blueprints_editor_window::BlueprintSceneWindow;
 use bevy_reactive_blueprints_editor_window::*;
 
 pub fn main() {

@@ -2,13 +2,11 @@ use std::path::Path;
 
 use bevy::{prelude::*, utils::HashMap};
 use bevy_editor_pls::{
-    default_windows::{
-        add::{AddItem, AddWindow},
-        scenes::NotInScene,
-    },
+    default_windows::add::{AddItem, AddWindow},
     editor::Editor,
     editor_window::{EditorWindow, EditorWindowContext},
     egui_dock::egui,
+    prelude::NotInScene,
 };
 use bevy_reactive_blueprints::Blueprint;
 
@@ -32,14 +30,13 @@ pub struct BlueprintSceneWindow;
 
 impl EditorWindow for BlueprintSceneWindow {
     type State = BlueprintSceneWindowState;
-    const NAME: &'static str = "Scenes";
+    const NAME: &'static str = "Blueprint Scenes";
 
     fn ui(world: &mut World, mut cx: EditorWindowContext, ui: &mut egui::Ui) {
         let state = cx.state_mut::<BlueprintSceneWindow>().unwrap();
-        const PATH: &'static str = "scenes";
+        const PATH: &'static str = "editor-scenes";
 
-        let editor_path = std::env::var("EDITOR_PATH").unwrap_or("editor".to_string());
-        let full_path = std::path::Path::new(&editor_path).join("assets").join(PATH);
+        let full_path = std::path::Path::new("assets").join(PATH);
         let directory = std::fs::read_dir(full_path.clone()).unwrap_or_else(|_| {
             std::fs::create_dir(full_path.clone()).unwrap();
             std::fs::read_dir(full_path.clone()).unwrap()
@@ -86,18 +83,9 @@ impl EditorWindow for BlueprintSceneWindow {
 
             ui.horizontal(|ui| {
                 let path = entry.path();
-                let mut components = path.components();
-                // editor/
-                components.next();
-                // assets/
-                components.next();
-                // scene/
-                components.next();
                 // <etc>/filename.scn.ron
-                let stripped_path = components.as_path().with_extension("").with_extension("");
-                let file_stem = stripped_path
-                    .to_str()
-                    .expect("file path to be convertible to string");
+                let stripped_path = path.with_extension("").with_extension("");
+                let file_stem = stripped_path.file_name().unwrap().to_str().unwrap();
 
                 ui.label(file_stem);
                 if ui.button("Play").clicked() {
