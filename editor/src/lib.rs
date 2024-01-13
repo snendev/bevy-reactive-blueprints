@@ -36,7 +36,8 @@ impl EditorWindow for BlueprintSceneWindow {
         let state = cx.state_mut::<BlueprintSceneWindow>().unwrap();
         const PATH: &'static str = "editor-scenes";
 
-        let full_path = std::path::Path::new("assets").join(PATH);
+        // TODO: path pulls files from a different cwd than asset server
+        let full_path = std::path::Path::new("editor/assets").join(PATH);
         let directory = std::fs::read_dir(full_path.clone()).unwrap_or_else(|_| {
             std::fs::create_dir(full_path.clone()).unwrap();
             std::fs::read_dir(full_path.clone()).unwrap()
