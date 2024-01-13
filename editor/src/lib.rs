@@ -37,8 +37,9 @@ impl EditorWindow for BlueprintSceneWindow {
     fn ui(world: &mut World, mut cx: EditorWindowContext, ui: &mut egui::Ui) {
         let state = cx.state_mut::<BlueprintSceneWindow>().unwrap();
         const PATH: &'static str = "scenes";
-        // TODO: THIS DOES NOT WORK IN GENERAL CONTEXTS
-        let full_path = std::path::Path::new("editor").join("assets").join(PATH);
+
+        let editor_path = std::env::var("EDITOR_PATH").unwrap_or("editor".to_string());
+        let full_path = std::path::Path::new(&editor_path).join("assets").join(PATH);
         let directory = std::fs::read_dir(full_path.clone()).unwrap_or_else(|_| {
             std::fs::create_dir(full_path.clone()).unwrap();
             std::fs::read_dir(full_path.clone()).unwrap()
@@ -54,9 +55,7 @@ impl EditorWindow for BlueprintSceneWindow {
                 state.scene_save_result = None;
             }
 
-            let enter_pressed = ui.input(|input| input.key_pressed(egui::Key::Enter));
-
-            if ui.button("Save").clicked() || enter_pressed {
+            if ui.button("Save").clicked() {
                 let filename = if state.filename.is_empty() {
                     DEFAULT_FILENAME
                 } else {
