@@ -17,6 +17,9 @@ pub fn main() {
     app.add_plugins((
         DefaultPlugins,
         EditorPlugin::default().in_new_window(Window::default()),
+        BlueprintsEditorPlugin {
+            asset_path: "editor/assets",
+        },
         FrameTimeDiagnosticsPlugin::default(),
         EntityCountDiagnosticsPlugin::default(),
         BlueprintsPlugin,

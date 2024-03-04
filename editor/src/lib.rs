@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use bevy::{prelude::*, utils::HashMap};
 use bevy_editor_pls::{
@@ -34,13 +34,16 @@ impl EditorWindow for BlueprintSceneWindow {
 
     fn ui(world: &mut World, mut cx: EditorWindowContext, ui: &mut egui::Ui) {
         let state = cx.state_mut::<BlueprintSceneWindow>().unwrap();
-        const PATH: &'static str = "editor-scenes";
+        let assets_path = if let Some(assets_path) = world.get_resource::<BlueprintScenesPath>() {
+            assets_path.0.clone()
+        } else {
+            Path::new("assets").to_path_buf()
+        };
 
         // TODO: path pulls files from a different cwd than asset server
-        let full_path = std::path::Path::new("editor/assets").join(PATH);
-        let directory = std::fs::read_dir(full_path.clone()).unwrap_or_else(|_| {
-            std::fs::create_dir(full_path.clone()).unwrap();
-            std::fs::read_dir(full_path.clone()).unwrap()
+        let directory = std::fs::read_dir(&assets_path).unwrap_or_else(|_| {
+            std::fs::create_dir(&assets_path).unwrap();
+            std::fs::read_dir(&assets_path).unwrap()
         });
 
         ui.horizontal(|ui| {
@@ -59,7 +62,7 @@ impl EditorWindow for BlueprintSceneWindow {
                 } else {
                     &state.filename
                 };
-                let filename = full_path.join(filename).with_extension(EXTENSION);
+                let filename = assets_path.join(filename).with_extension(EXTENSION);
 
                 let mut query = world.query_filtered::<Entity, Without<NotInScene>>();
                 let entities = query.iter(world).collect();
@@ -98,7 +101,9 @@ impl EditorWindow for BlueprintSceneWindow {
                         world.despawn(entity);
                     }
                     // load the new scene
-                    let scene_filename = Path::new(PATH).join(file_stem).with_extension(EXTENSION);
+                    let scene_filename = Path::new(&assets_path)
+                        .join(file_stem)
+                        .with_extension(EXTENSION);
                     state.play_scene_request = Some(load_scene(
                         world,
                         scene_filename
@@ -196,5 +201,20 @@ impl AppBlueprintExt for &mut App {
         filter.0 = filter.0.clone().allow::<Blueprint<B>>();
 
         self
+    }
+}
+
+#[derive(Resource)]
+pub struct BlueprintScenesPath(PathBuf);
+
+pub struct BlueprintsEditorPlugin<'a> {
+    pub asset_path: &'a str,
+}
+
+impl Plugin for BlueprintsEditorPlugin<'static> {
+    fn build(&self, app: &mut App) {
+        app.insert_resource(BlueprintScenesPath(
+            Path::new(self.asset_path).join("editor-scenes"),
+        ));
     }
 }
