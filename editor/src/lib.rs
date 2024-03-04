@@ -15,6 +15,7 @@ pub enum EditorOpenSetting {
     FullScreen,
 }
 
+const ASSETS_PATH: &str = "editor-scenes";
 const DEFAULT_FILENAME: &str = "scene";
 const EXTENSION: &str = "scn.ron";
 
@@ -34,12 +35,8 @@ impl EditorWindow for BlueprintSceneWindow {
 
     fn ui(world: &mut World, mut cx: EditorWindowContext, ui: &mut egui::Ui) {
         let state = cx.state_mut::<BlueprintSceneWindow>().unwrap();
-        let assets_path = if let Some(assets_path) = world.get_resource::<BlueprintScenesPath>() {
-            assets_path.0.clone()
-        } else {
-            Path::new("assets").to_path_buf()
-        };
 
+        let assets_path = std::path::Path::new("assets").join(&ASSETS_PATH);
         // TODO: path pulls files from a different cwd than asset server
         let directory = std::fs::read_dir(&assets_path).unwrap_or_else(|_| {
             std::fs::create_dir(&assets_path).unwrap();
@@ -62,7 +59,9 @@ impl EditorWindow for BlueprintSceneWindow {
                 } else {
                     &state.filename
                 };
-                let filename = assets_path.join(filename).with_extension(EXTENSION);
+                let filename = std::path::Path::new(&assets_path)
+                    .join(filename)
+                    .with_extension(EXTENSION);
 
                 let mut query = world.query_filtered::<Entity, Without<NotInScene>>();
                 let entities = query.iter(world).collect();
@@ -101,7 +100,7 @@ impl EditorWindow for BlueprintSceneWindow {
                         world.despawn(entity);
                     }
                     // load the new scene
-                    let scene_filename = Path::new(&assets_path)
+                    let scene_filename = Path::new(&ASSETS_PATH)
                         .join(file_stem)
                         .with_extension(EXTENSION);
                     state.play_scene_request = Some(load_scene(
@@ -201,26 +200,5 @@ impl AppBlueprintExt for &mut App {
         filter.0 = filter.0.clone().allow::<Blueprint<B>>();
 
         self
-    }
-}
-
-#[derive(Resource)]
-pub struct BlueprintScenesPath(PathBuf);
-
-pub struct BlueprintsEditorPlugin<'a> {
-    asset_path: &'a str,
-}
-
-impl<'a> BlueprintsEditorPlugin<'a> {
-    pub fn new(path: &'a str) -> Self {
-        Self { asset_path: path }
-    }
-}
-
-impl Plugin for BlueprintsEditorPlugin<'static> {
-    fn build(&self, app: &mut App) {
-        app.insert_resource(BlueprintScenesPath(
-            Path::new(self.asset_path).join("editor-scenes"),
-        ));
     }
 }

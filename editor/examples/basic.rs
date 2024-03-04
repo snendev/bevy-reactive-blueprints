@@ -15,9 +15,11 @@ use bevy_reactive_blueprints_editor_window::*;
 pub fn main() {
     let mut app = App::new();
     app.add_plugins((
-        DefaultPlugins,
+        DefaultPlugins.set(AssetPlugin {
+            file_path: "../assets".to_string(),
+            ..Default::default()
+        }),
         EditorPlugin::default().in_new_window(Window::default()),
-        BlueprintsEditorPlugin::new("editor/assets"),
         FrameTimeDiagnosticsPlugin::default(),
         EntityCountDiagnosticsPlugin::default(),
         BlueprintsPlugin,
