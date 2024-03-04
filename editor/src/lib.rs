@@ -208,7 +208,13 @@ impl AppBlueprintExt for &mut App {
 pub struct BlueprintScenesPath(PathBuf);
 
 pub struct BlueprintsEditorPlugin<'a> {
-    pub asset_path: &'a str,
+    asset_path: &'a str,
+}
+
+impl<'a> BlueprintsEditorPlugin<'a> {
+    pub fn new(path: &'a str) -> Self {
+        Self { asset_path: path }
+    }
 }
 
 impl Plugin for BlueprintsEditorPlugin<'static> {
