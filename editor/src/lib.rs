@@ -176,6 +176,10 @@ pub trait AppBlueprintExt {
     fn register_blueprint<B>(self) -> Self
     where
         B: Default + TypePath + Send + Sync + 'static;
+
+    fn ignore_all_component<C>(self) -> Self
+    where
+        C: Component + Send + Sync + 'static;
 }
 
 impl AppBlueprintExt for &mut App {
@@ -198,6 +202,22 @@ impl AppBlueprintExt for &mut App {
             .world
             .get_resource_or_insert_with(|| BlueprintsFilter(SceneFilter::deny_all()));
         filter.0 = filter.0.clone().allow::<Blueprint<B>>();
+
+        self
+    }
+
+    fn ignore_all_component<C>(self) -> Self
+    where
+        C: Component + Send + Sync + 'static,
+    {
+        self.add_systems(
+            PostUpdate,
+            |query: Query<Entity, Added<C>>, mut commands: Commands| {
+                for entity in query.iter() {
+                    commands.entity(entity).insert(NotInScene);
+                }
+            },
+        );
 
         self
     }
