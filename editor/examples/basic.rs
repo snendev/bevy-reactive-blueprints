@@ -96,8 +96,8 @@ impl FromBlueprint<RectBlueprint> for RectBundle {
             pbr: PbrBundle {
                 mesh: params
                     .meshes
-                    .add(shape::Box::new(blueprint.size.x, blueprint.size.y, 1.0).into()),
-                material: params.materials.add(blueprint.color.into()),
+                    .add(Cuboid::new(blueprint.size.x, blueprint.size.y, 1.0).mesh()),
+                material: params.materials.add(blueprint.color),
                 transform: Transform::from_xyz(blueprint.origin.x, blueprint.origin.y, 0.0),
                 ..default()
             },

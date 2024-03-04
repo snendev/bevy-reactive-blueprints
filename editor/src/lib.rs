@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{ecs::entity::EntityHashMap, prelude::*};
 use bevy_editor_pls::{
     default_windows::add::{AddItem, AddWindow},
     editor::Editor,
@@ -166,7 +166,7 @@ fn poll_loading_scene(world: &mut World, scene: &Handle<DynamicScene>) -> AnyRes
                 None => Err("Not ready yet!"),
             }?;
             world.resource_scope(|world: &mut World, registry: Mut<AppTypeRegistry>| {
-                Ok(scene.write_to_world_with(world, &mut HashMap::default(), &registry)?)
+                Ok(scene.write_to_world_with(world, &mut EntityHashMap::default(), &registry)?)
             })
         },
     )

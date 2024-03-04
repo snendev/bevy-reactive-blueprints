@@ -11,9 +11,9 @@ readme = "README.md"
 repository = "https://github.com/snendev/bevy-reactive-blueprints"
 
 [dependencies]
-bevy = { version = "0.12", default-features = false }
+bevy = { version = "0.13", default-features = false }
 
 [dev-dependencies]
-bevy = { version = "0.12", default-features = false, features = [
+bevy = { version = "0.13", default-features = false, features = [
     "tonemapping_luts",
 ] }
