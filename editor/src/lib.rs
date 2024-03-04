@@ -212,13 +212,26 @@ impl AppBlueprintExt for &mut App {
     {
         self.add_systems(
             PostUpdate,
-            |query: Query<Entity, Added<C>>, mut commands: Commands| {
+            |query: Query<Entity, Added<C>>, children: Query<&Children>, mut commands: Commands| {
                 for entity in query.iter() {
-                    commands.entity(entity).insert(NotInScene);
+                    let mut ignored_hierarchy = vec![];
+                    collect_hierarchy(&mut ignored_hierarchy, entity, &children);
+                    for entity in ignored_hierarchy {
+                        commands.entity(entity).insert(NotInScene);
+                    }
                 }
             },
         );
 
         self
+    }
+}
+
+fn collect_hierarchy(buffer: &mut Vec<Entity>, entity: Entity, children_query: &Query<&Children>) {
+    buffer.push(entity);
+    if let Ok(children) = children_query.get(entity) {
+        for child in children {
+            collect_hierarchy(buffer, *child, children_query);
+        }
     }
 }
