@@ -164,7 +164,7 @@ where
                 Self::sync_blueprint_prefab.in_set(BlueprintSet::Sync),
             ),
         );
-        #[cfg(debug_assertions)]
+
         app.register_type::<Blueprint<B>>().register_type::<B>();
     }
 }
