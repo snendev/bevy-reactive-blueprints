@@ -252,7 +252,7 @@ mod tests {
         );
         assert_eq!(
             app.world
-                .query::<Or<(&RectSize, &RectColor, &RectArea)>>()
+                .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
                 .iter(&app.world)
                 .collect::<Vec<_>>()
                 .len(),
@@ -263,7 +263,7 @@ mod tests {
         app.update();
         assert_eq!(
             app.world
-                .query::<Or<(&RectSize, &RectColor, &RectArea)>>()
+                .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
                 .iter(&app.world)
                 .collect::<Vec<_>>()
                 .len(),
@@ -336,7 +336,7 @@ mod tests {
         app.update();
         assert_eq!(
             app.world
-                .query::<Or<(&RectSize, &RectColor, &RectArea)>>()
+                .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
                 .iter(&app.world)
                 .collect::<Vec<_>>()
                 .len(),
@@ -348,7 +348,7 @@ mod tests {
         app.update();
         assert_eq!(
             app.world
-                .query::<Or<(&RectSize, &RectColor, &RectArea)>>()
+                .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
                 .iter(&app.world)
                 .collect::<Vec<_>>()
                 .len(),
@@ -417,7 +417,7 @@ mod tests {
         app.update();
         assert_eq!(
             app.world
-                .query::<Or<(&RectSize, &RectColor, &RectArea)>>()
+                .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
                 .iter(&app.world)
                 .collect::<Vec<_>>()
                 .len(),
@@ -487,7 +487,7 @@ mod tests {
         app.update();
         assert_eq!(
             app.world
-                .query::<Or<(&RectSize, &RectColor, &RectArea)>>()
+                .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
                 .iter(&app.world)
                 .collect::<Vec<_>>()
                 .len(),
