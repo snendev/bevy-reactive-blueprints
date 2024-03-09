@@ -75,6 +75,7 @@ struct RectSize(Vec2);
 
 #[derive(Bundle)]
 struct RectBundle {
+    name: Name,
     size: RectSize,
     pbr: PbrBundle,
 }
@@ -92,6 +93,7 @@ impl FromBlueprint<RectBlueprint> for RectBundle {
         params: &mut StaticSystemParam<Self::Params<'_, '_>>,
     ) -> Self {
         RectBundle {
+            name: Name::new("My Rect"),
             size: RectSize(blueprint.size),
             pbr: PbrBundle {
                 mesh: params
