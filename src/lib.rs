@@ -120,6 +120,10 @@ where
     P: Bundle + FromBlueprint<B>,
     T: BlueprintTarget,
 {
+    fn should_sync_blueprint(blueprint_query: Query<(), Changed<Blueprint<B>>>) -> bool {
+        !blueprint_query.is_empty()
+    }
+
     fn sync_blueprint_prefab(
         mut commands: Commands,
         blueprint_query: Query<(Entity, &Blueprint<B>), Changed<Blueprint<B>>>,
@@ -161,7 +165,9 @@ where
             Update,
             (
                 Self::handle_removed_blueprints.in_set(BlueprintSet::Cleanup),
-                Self::sync_blueprint_prefab.in_set(BlueprintSet::Sync),
+                Self::sync_blueprint_prefab
+                    .in_set(BlueprintSet::Sync)
+                    .run_if(Self::should_sync_blueprint),
             ),
         );
 
@@ -493,5 +499,98 @@ mod tests {
                 .len(),
             0
         );
+    }
+
+    // We don't want to panic if FromBlueprint::<MyType>::Params is not ready at startup time
+    #[test]
+    fn params_dont_panic() {
+        #[derive(Resource)]
+        struct UnattachedResource;
+
+        #[derive(Bundle)]
+        struct RectBundle {
+            color: RectColor,
+        }
+
+        impl FromBlueprint<Rect> for RectBundle {
+            type Params<'w, 's> = Res<'w, UnattachedResource>;
+            fn from_blueprint(_: &Rect, _: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self {
+                RectBundle {
+                    color: RectColor(Color::RED),
+                }
+            }
+        }
+
+        #[derive(Bundle)]
+        struct RectChildBundle {
+            area: RectArea,
+            size: RectSize,
+        }
+
+        impl FromBlueprint<Rect> for RectChildBundle {
+            type Params<'w, 's> = ();
+            fn from_blueprint(
+                blueprint: &Rect,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
+            ) -> Self {
+                RectChildBundle {
+                    size: RectSize(blueprint.size),
+                    area: RectArea(blueprint.size.x * blueprint.size.y),
+                }
+            }
+        }
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, BlueprintsPlugin))
+            // can add multiple prefabs for the same blueprint component
+            .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default());
+    }
+
+    // But it _should_ panic if the user tries to attach the blueprint before the system params are ready.
+    #[test]
+    #[should_panic]
+    fn params_do_panic_if_called() {
+        #[derive(Resource)]
+        struct UnattachedResource;
+
+        #[derive(Bundle)]
+        struct RectBundle {
+            color: RectColor,
+        }
+
+        impl FromBlueprint<Rect> for RectBundle {
+            type Params<'w, 's> = Res<'w, UnattachedResource>;
+            fn from_blueprint(_: &Rect, _: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self {
+                RectBundle {
+                    color: RectColor(Color::RED),
+                }
+            }
+        }
+
+        #[derive(Bundle)]
+        struct RectChildBundle {
+            area: RectArea,
+            size: RectSize,
+        }
+
+        impl FromBlueprint<Rect> for RectChildBundle {
+            type Params<'w, 's> = ();
+            fn from_blueprint(
+                blueprint: &Rect,
+                _: &mut StaticSystemParam<Self::Params<'_, '_>>,
+            ) -> Self {
+                RectChildBundle {
+                    size: RectSize(blueprint.size),
+                    area: RectArea(blueprint.size.x * blueprint.size.y),
+                }
+            }
+        }
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, BlueprintsPlugin))
+            // can add multiple prefabs for the same blueprint component
+            .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default());
+        app.world.spawn(Blueprint::<Rect>::default());
+        app.update();
     }
 }
