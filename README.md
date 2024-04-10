@@ -8,7 +8,7 @@ The supported workflow involves defining a type that serves as a builder for som
 
 It is worth noting that the intention is _not_ to encourage frequently editing blueprint types in the application. Blueprints are best used for spawning and saving scenes or for development contexts.
 
-In particular, this crate is used well alongside [`bevy_editor_pls`](https://github.com/jakobhellermann/bevy_editor_pls) so that the various "object kinds" in a given application can be spawned and manipulated using the blueprints. An example is provided in the `examples` directory. Scene files can also strictly save Blueprint components, minimizing the amount of data stored. ([`iyes_scene_tools`](https://github.com/IyesGames/iyes_scene_tools) is useful here, but an example is not provided yet.)
+In particular, this crate is used well alongside [`bevy_editor_pls`](https://github.com/jakobhellermann/bevy_editor_pls) so that the various "object kinds" in a given application can be spawned and manipulated using the blueprints. An example is provided in the `examples` directory. Scene files can also strictly save Blueprint components, minimizing the amount of data stored.
 
 ## Usage
 
