@@ -542,8 +542,8 @@ mod tests {
 
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, BlueprintsPlugin))
-            // can add multiple prefabs for the same blueprint component
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default());
+        app.update();
     }
 
     // But it _should_ panic if the user tries to attach the blueprint before the system params are ready.
@@ -588,7 +588,6 @@ mod tests {
 
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, BlueprintsPlugin))
-            // can add multiple prefabs for the same blueprint component
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default());
         app.world.spawn(Blueprint::<Rect>::default());
         app.update();
