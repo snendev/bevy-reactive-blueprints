@@ -195,7 +195,7 @@ impl Plugin for BlueprintsPlugin {
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::*;
+    use bevy::{color::palettes, prelude::*};
 
     use super::*;
 
@@ -233,7 +233,7 @@ mod tests {
             ) -> Self {
                 RectBundle {
                     size: RectSize(blueprint.size),
-                    color: RectColor(Color::RED),
+                    color: RectColor(Color::Srgba(palettes::css::BLUE)),
                     area: RectArea(blueprint.size.x * blueprint.size.y),
                 }
             }
@@ -246,31 +246,33 @@ mod tests {
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default());
         // when spawning an entity of this kind, spawn a Blueprint::<MyType>
         // (note: MyType does not have to be a component, but it can be)
-        let entity = app.world.spawn(Blueprint::<Rect>::default()).id();
+        let entity = app.world_mut().spawn(Blueprint::<Rect>::default()).id();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query::<(&RectSize, &RectColor, &RectArea)>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             1
         );
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             1
         );
         // when the blueprint component is removed, the additional components are removed as well
-        app.world.entity_mut(entity).remove::<Blueprint<Rect>>();
+        app.world_mut()
+            .entity_mut(entity)
+            .remove::<Blueprint<Rect>>();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             0
@@ -297,7 +299,7 @@ mod tests {
             ) -> Self {
                 RectBundle {
                     size: RectSize(blueprint.size),
-                    color: RectColor(Color::RED),
+                    color: RectColor(Color::Srgba(palettes::css::RED)),
                     area: RectArea(blueprint.size.x * blueprint.size.y),
                 }
             }
@@ -314,7 +316,7 @@ mod tests {
                 };
                 RectBundle {
                     size: RectSize(rect.size),
-                    color: RectColor(Color::BLUE),
+                    color: RectColor(Color::Srgba(palettes::css::BLUE)),
                     area: RectArea(rect.size.x * rect.size.y),
                 }
             }
@@ -326,36 +328,41 @@ mod tests {
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default())
             .add_plugins(BlueprintPlugin::<SpecificRect, RectBundle>::default());
         // spawn one entity for each blueprint
-        let entity1 = app.world.spawn(Blueprint::<Rect>::default()).id();
-        let entity2 = app.world.spawn(Blueprint::<SpecificRect>::default()).id();
+        let entity1 = app.world_mut().spawn(Blueprint::<Rect>::default()).id();
+        let entity2 = app
+            .world_mut()
+            .spawn(Blueprint::<SpecificRect>::default())
+            .id();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query::<(&RectSize, &RectColor, &RectArea)>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             2
         );
         // clean up one at a time
-        app.world.entity_mut(entity1).remove::<Blueprint<Rect>>();
+        app.world_mut()
+            .entity_mut(entity1)
+            .remove::<Blueprint<Rect>>();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             1
         );
-        app.world
+        app.world_mut()
             .entity_mut(entity2)
             .remove::<Blueprint<SpecificRect>>();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             0
@@ -378,7 +385,7 @@ mod tests {
             ) -> Self {
                 RectBundle {
                     size: RectSize(blueprint.size),
-                    color: RectColor(Color::RED),
+                    color: RectColor(Color::Srgba(palettes::css::RED)),
                 }
             }
         }
@@ -408,23 +415,25 @@ mod tests {
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default())
             .add_plugins(BlueprintPlugin::<Rect, SecondRectBundle>::default());
         // spawn the blueprint component
-        let entity = app.world.spawn(Blueprint::<Rect>::default()).id();
+        let entity = app.world_mut().spawn(Blueprint::<Rect>::default()).id();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query::<(&RectSize, &RectColor, &RectArea)>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             1
         );
         // cleanup is handled automatically
-        app.world.entity_mut(entity).remove::<Blueprint<Rect>>();
+        app.world_mut()
+            .entity_mut(entity)
+            .remove::<Blueprint<Rect>>();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             0
@@ -442,7 +451,7 @@ mod tests {
             type Params<'w, 's> = ();
             fn from_blueprint(_: &Rect, _: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self {
                 RectBundle {
-                    color: RectColor(Color::RED),
+                    color: RectColor(Color::Srgba(palettes::css::RED)),
                 }
             }
         }
@@ -472,29 +481,31 @@ mod tests {
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default())
             .add_plugins(BlueprintPlugin::<Rect, RectChildBundle, AsChild>::default());
         // spawn the blueprint component
-        let entity = app.world.spawn(Blueprint::<Rect>::default()).id();
+        let entity = app.world_mut().spawn(Blueprint::<Rect>::default()).id();
         app.update();
         let parent_entities = app
-            .world
+            .world_mut()
             .query::<(Entity, &RectColor, &Children)>()
-            .iter(&app.world)
+            .iter(app.world())
             .collect::<Vec<_>>();
         assert_eq!(parent_entities.len(), 1);
         let parent_entity = parent_entities.first().unwrap().0;
         let child_entities = app
-            .world
+            .world_mut()
             .query::<(&RectSize, &RectArea, &Parent)>()
-            .iter(&app.world)
+            .iter(app.world())
             .collect::<Vec<_>>();
         assert_eq!(child_entities.len(), 1);
         assert_eq!(child_entities.first().unwrap().2.get(), parent_entity);
         // cleanup is handled automatically
-        app.world.entity_mut(entity).remove::<Blueprint<Rect>>();
+        app.world_mut()
+            .entity_mut(entity)
+            .remove::<Blueprint<Rect>>();
         app.update();
         assert_eq!(
-            app.world
+            app.world_mut()
                 .query_filtered::<(), Or<(With<RectSize>, With<RectColor>, With<RectArea>)>>()
-                .iter(&app.world)
+                .iter(app.world())
                 .collect::<Vec<_>>()
                 .len(),
             0
@@ -516,7 +527,7 @@ mod tests {
             type Params<'w, 's> = Res<'w, UnattachedResource>;
             fn from_blueprint(_: &Rect, _: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self {
                 RectBundle {
-                    color: RectColor(Color::RED),
+                    color: RectColor(Color::Srgba(palettes::css::RED)),
                 }
             }
         }
@@ -562,7 +573,7 @@ mod tests {
             type Params<'w, 's> = Res<'w, UnattachedResource>;
             fn from_blueprint(_: &Rect, _: &mut StaticSystemParam<Self::Params<'_, '_>>) -> Self {
                 RectBundle {
-                    color: RectColor(Color::RED),
+                    color: RectColor(Color::Srgba(palettes::css::RED)),
                 }
             }
         }
@@ -589,7 +600,7 @@ mod tests {
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, BlueprintsPlugin))
             .add_plugins(BlueprintPlugin::<Rect, RectBundle>::default());
-        app.world.spawn(Blueprint::<Rect>::default());
+        app.world_mut().spawn(Blueprint::<Rect>::default());
         app.update();
     }
 }

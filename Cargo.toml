@@ -1,5 +1,5 @@
 [workspace]
-# members = ["editor"]
+members = ["editor"]
 
 [package]
 name = "bevy_reactive_blueprints"

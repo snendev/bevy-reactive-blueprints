@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use bevy::{ecs::entity::EntityHashMap, prelude::*};
 use bevy_editor_pls::{
@@ -147,7 +147,8 @@ fn save_world(
         .remove_empty_entities();
     let scene = scene_builder.build();
 
-    let ron = scene.serialize_ron(type_registry)?;
+    let type_registry = type_registry.read();
+    let ron = scene.serialize(&type_registry)?;
     std::fs::write(name, ron)?;
     Ok(())
 }
@@ -188,7 +189,7 @@ impl AppBlueprintExt for &mut App {
         B: Default + TypePath + Send + Sync + 'static,
     {
         let mut editor = self
-            .world
+            .world_mut()
             .get_resource_mut::<Editor>()
             .expect("Editor should exist");
         let state = editor
@@ -199,7 +200,7 @@ impl AppBlueprintExt for &mut App {
             AddItem::component_named::<Blueprint<B>>(B::type_path().into()),
         );
         let mut filter = self
-            .world
+            .world_mut()
             .get_resource_or_insert_with(|| BlueprintsFilter(SceneFilter::deny_all()));
         filter.0 = filter.0.clone().allow::<Blueprint<B>>();
 

@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes,
     diagnostic::{EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
     ecs::system::{StaticSystemParam, SystemParam},
     prelude::*,
@@ -27,7 +28,7 @@ pub fn main() {
 
     // add the window
     app.add_editor_window::<BlueprintSceneWindow>();
-    let mut internal_state = app.world.resource_mut::<EditorInternalState>();
+    let mut internal_state = app.world_mut().resource_mut::<EditorInternalState>();
     internal_state.split_below::<BlueprintSceneWindow>(NodeIndex::root().left().left(), 0.6);
 
     // register some blueprint
@@ -36,7 +37,7 @@ pub fn main() {
         .register_blueprint::<RectBlueprint>()
         .register_type::<RectSize>();
 
-    app.world.spawn((
+    app.world_mut().spawn((
         NotInScene,
         Camera3dBundle {
             transform: Transform::from_translation(Vec3::Z * 10.),
@@ -58,7 +59,7 @@ impl Default for RectBlueprint {
     fn default() -> Self {
         RectBlueprint {
             size: 4. * Vec2::ONE,
-            color: Color::BLUE,
+            color: Color::Srgba(palettes::css::BLUE),
             origin: Default::default(),
         }
     }
@@ -76,6 +77,7 @@ struct RectSize(Vec2);
 #[derive(Bundle)]
 struct RectBundle {
     name: Name,
+    rect: Rect,
     size: RectSize,
     pbr: PbrBundle,
 }
@@ -95,6 +97,7 @@ impl FromBlueprint<RectBlueprint> for RectBundle {
         RectBundle {
             name: Name::new("My Rect"),
             size: RectSize(blueprint.size),
+            rect: Rect,
             pbr: PbrBundle {
                 mesh: params
                     .meshes

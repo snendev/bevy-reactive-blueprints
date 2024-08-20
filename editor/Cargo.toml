@@ -1,7 +1,7 @@
 
 [package]
 name = "bevy_reactive_blueprints_editor_window"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Sean Sullivan <me@snen.dev>"]
 license = "MIT OR Apache-2.0"
@@ -9,12 +9,12 @@ readme = "README.md"
 repository = "https://github.com/snendev/bevy-reactive-blueprints"
 
 [dependencies]
-bevy_reactive_blueprints = { path = "../", version = "0.1" }
-bevy = { version = "0.13", default-features = false, features = [
+bevy_reactive_blueprints = { path = "../", version = "0.2" }
+bevy = { version = "0.14", default-features = false, features = [
     "tonemapping_luts",
 ] }
 
-bevy_editor_pls = "0.8"
+bevy_editor_pls = "0.9"
 
 [[example]]
 name = "basic"
