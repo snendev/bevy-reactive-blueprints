@@ -12,12 +12,12 @@
             x: 4.0,
             y: 4.0,
           ),
-          color: Rgba(
+          color: Srgba((
             red: 0.0,
             green: 0.0,
             blue: 1.0,
             alpha: 1.0,
-          ),
+          )),
         )),
       },
     ),

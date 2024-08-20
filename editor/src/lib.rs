@@ -8,7 +8,7 @@ use bevy_editor_pls::{
     egui_dock::egui,
     prelude::NotInScene,
 };
-use bevy_reactive_blueprints::Blueprint;
+use bevy_reactive_blueprints::{Blueprint, IsBlueprint};
 
 pub enum EditorOpenSetting {
     Windowed,
@@ -63,7 +63,7 @@ impl EditorWindow for BlueprintSceneWindow {
                     .join(filename)
                     .with_extension(EXTENSION);
 
-                let mut query = world.query_filtered::<Entity, Without<NotInScene>>();
+                let mut query = world.query_filtered::<Entity, With<IsBlueprint>>();
                 let entities = query.iter(world).collect();
                 state.scene_save_result =
                     Some(save_world(world, filename.to_str().unwrap(), entities));

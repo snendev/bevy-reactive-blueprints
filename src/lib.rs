@@ -33,6 +33,10 @@ impl<B: Default> Blueprint<B> {
     }
 }
 
+#[derive(Debug, Component, Default, Reflect)]
+#[reflect(Component)]
+pub struct IsBlueprint;
+
 pub struct AsSelf;
 pub struct AsChild;
 
@@ -55,6 +59,7 @@ pub trait BlueprintTarget {
 
 impl BlueprintTarget for AsSelf {
     fn remove_target_bundle<T, P: Bundle + FromBlueprint<T>>(entity: &mut EntityCommands) {
+        entity.remove::<IsBlueprint>();
         entity.remove::<P>();
     }
 
@@ -62,12 +67,14 @@ impl BlueprintTarget for AsSelf {
         entity: &mut EntityCommands,
         bundle: P,
     ) {
+        entity.insert(IsBlueprint);
         entity.insert(bundle);
     }
 }
 
 impl BlueprintTarget for AsChild {
     fn remove_target_bundle<T, P: Bundle + FromBlueprint<T>>(entity: &mut EntityCommands) {
+        entity.remove::<IsBlueprint>();
         entity.despawn_descendants();
     }
 
@@ -75,6 +82,7 @@ impl BlueprintTarget for AsChild {
         entity: &mut EntityCommands,
         bundle: P,
     ) {
+        entity.insert(IsBlueprint);
         entity.with_children(|builder| {
             builder.spawn(bundle);
         });
